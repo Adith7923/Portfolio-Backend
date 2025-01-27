@@ -28,8 +28,17 @@ public class ProjectController {
         return projectService.getAllProjects();
     }
 
-    // GET a single project by title
-    @GetMapping("/{title}")
+    // GET a project by ID
+    @GetMapping("/id/{id}")
+    public ResponseEntity<Project> getProjectById(@PathVariable Long id) {
+        Project project = projectService.getProjectById(id);
+        return project != null
+                ? ResponseEntity.ok(project)
+                : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    // GET a project by title
+    @GetMapping("/title/{title}")
     public ResponseEntity<Project> getProjectByTitle(@PathVariable String title) {
         Optional<Project> project = projectService.getProjectByTitle(title);
         return project.map(ResponseEntity::ok)
@@ -49,10 +58,8 @@ public class ProjectController {
         project.setDescription(description);
 
         // Convert comma-separated strings into lists
-        List<String> techList = Arrays.asList(technologiesUsed.split(","));
-        List<String> objList = Arrays.asList(objectives.split(","));
-        project.setTechnologiesUsed(techList);
-        project.setObjectives(objList);
+        project.setTechnologiesUsed(Arrays.asList(technologiesUsed.split(",")));
+        project.setObjectives(Arrays.asList(objectives.split(",")));
 
         project.setReportLink(reportLink);
 
@@ -60,7 +67,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProject);
     }
 
-    // PUT to update a project
+    // PUT to update an existing project
     @PutMapping("/{id}")
     public ResponseEntity<Project> updateProject(@PathVariable Long id,
                                                  @RequestParam("title") String title,
@@ -74,10 +81,8 @@ public class ProjectController {
         projectDetails.setDescription(description);
 
         // Convert comma-separated strings into lists
-        List<String> techList = Arrays.asList(technologiesUsed.split(","));
-        List<String> objList = Arrays.asList(objectives.split(","));
-        projectDetails.setTechnologiesUsed(techList);
-        projectDetails.setObjectives(objList);
+        projectDetails.setTechnologiesUsed(Arrays.asList(technologiesUsed.split(",")));
+        projectDetails.setObjectives(Arrays.asList(objectives.split(",")));
 
         projectDetails.setReportLink(reportLink);
 

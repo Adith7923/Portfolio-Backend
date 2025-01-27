@@ -23,35 +23,52 @@ public class ProjectService {
         return projectRepository.findAll();
     }
 
-    // Get project by title
+    // Get a project by ID
+    public Project getProjectById(Long id) {
+        return projectRepository.findById(id).orElse(null); // Returns the project if found, or null otherwise
+    }
+
+    // Get a project by title
     public Optional<Project> getProjectByTitle(String title) {
-        return projectRepository.findByTitle(title); // Use the custom method
+        return projectRepository.findByTitle(title); // Uses a custom repository method to find by title
     }
 
     // Create a new project
     public Project createProject(Project project, MultipartFile image) throws IOException {
-        project.setImage(image.getBytes()); // Save image as byte array in the database
+        if (image != null && !image.isEmpty()) {
+            project.setImage(image.getBytes()); // Save image as a byte array
+        }
         return projectRepository.save(project);
     }
 
-    // Update project (with image)
+    // Update an existing project (with image)
     public Project updateProject(Long id, Project projectDetails, MultipartFile image) throws IOException {
         Optional<Project> projectOptional = projectRepository.findById(id);
+
         if (projectOptional.isPresent()) {
             Project project = projectOptional.get();
+            // Update fields
             project.setTitle(projectDetails.getTitle());
             project.setDescription(projectDetails.getDescription());
             project.setTechnologiesUsed(projectDetails.getTechnologiesUsed());
+            project.setObjectives(projectDetails.getObjectives());
             project.setReportLink(projectDetails.getReportLink());
-            project.setImage(image.getBytes()); // Update image if a new one is uploaded
+
+            if (image != null && !image.isEmpty()) {
+                project.setImage(image.getBytes()); // Update the image if provided
+            }
+
             return projectRepository.save(project);
         }
-        return null;
+        return null; // Return null if the project was not found
     }
 
-    // Delete project by ID
+    // Delete a project by ID
     public boolean deleteProject(Long id) {
-        projectRepository.deleteById(id);
-        return !projectRepository.existsById(id);
+        if (projectRepository.existsById(id)) {
+            projectRepository.deleteById(id);
+            return true; // Return true if the deletion was successful
+        }
+        return false; // Return false if the project does not exist
     }
 }
