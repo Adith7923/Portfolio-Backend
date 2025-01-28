@@ -77,6 +77,7 @@ public class ProjectController {
                                                  @RequestParam("reportLink") String reportLink,
                                                  @RequestParam("image") MultipartFile image) throws IOException {
         Project projectDetails = new Project();
+        projectDetails.setId(id);
         projectDetails.setTitle(title);
         projectDetails.setDescription(description);
 

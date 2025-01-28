@@ -1,13 +1,9 @@
 package com.example.Portfolio.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ElementCollection; // For storing lists in the database
-import jakarta.persistence.CollectionTable; // To customize the table used for the collection
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
 
 @Entity
@@ -18,25 +14,25 @@ public class Project {
     private Long id;
 
     private String title;
+
     @Lob
-    @Column(length = 100000)
+    @Column(columnDefinition = "TEXT")
     private String description;
+
     private String reportLink;
 
-    @ElementCollection
-    @CollectionTable(name = "project_technologies") // Custom table name for technologies
-    @Column(name = "technology")
-    private List<String> technologiesUsed; // List to store technologies
+    @Column(columnDefinition = "TEXT") // Store technologiesUsed as JSON
+    private String technologiesUsed;
 
-    @ElementCollection
-    @CollectionTable(name = "project_objectives") // Custom table name for objectives
-    @Column(name = "objective")
-    private List<String> objectives; // List to store project objectives
+    @Column(columnDefinition = "TEXT") // Store objectives as JSON
+    private String objectives;
 
     @Lob
     private byte[] image; // Store image as a byte array
 
-    // Getters and setters
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -70,19 +66,37 @@ public class Project {
     }
 
     public List<String> getTechnologiesUsed() {
-        return technologiesUsed;
+        try {
+            return objectMapper.readValue(technologiesUsed, new TypeReference<List<String>>() {});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void setTechnologiesUsed(List<String> technologiesUsed) {
-        this.technologiesUsed = technologiesUsed;
+        try {
+            this.technologiesUsed = objectMapper.writeValueAsString(technologiesUsed);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public List<String> getObjectives() {
-        return objectives;
+        try {
+            return objectMapper.readValue(objectives, new TypeReference<List<String>>() {});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void setObjectives(List<String> objectives) {
-        this.objectives = objectives;
+        try {
+            this.objectives = objectMapper.writeValueAsString(objectives);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public byte[] getImage() {
