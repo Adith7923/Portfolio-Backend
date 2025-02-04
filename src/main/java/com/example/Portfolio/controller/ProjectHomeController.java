@@ -4,6 +4,7 @@ import com.example.Portfolio.model.ProjectHome;
 import com.example.Portfolio.service.ProjectHomeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,11 +21,13 @@ public class ProjectHomeController {
     @Autowired
     private ProjectHomeService service;
 
+    // 🔓 Public - Anyone can view project home details
     @GetMapping
     public List<ProjectHome> getAllProjects() {
         return service.getAllProjects();
     }
 
+    // 🔓 Public - Anyone can view a specific project
     @GetMapping("/{id}")
     public ResponseEntity<ProjectHome> getProjectById(@PathVariable Long id) {
         return service.getProjectById(id)
@@ -32,6 +35,8 @@ public class ProjectHomeController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // 🔒 Admin Only - Create a new project
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ProjectHome> createProject(@RequestParam("title") String title,
                                                      @RequestParam("description") String description,
@@ -50,6 +55,8 @@ public class ProjectHomeController {
         }
     }
 
+    // 🔒 Admin Only - Delete a project
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         service.deleteProject(id);

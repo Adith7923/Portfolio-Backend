@@ -19,6 +19,10 @@ public class Project {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String extraDescription; // ✅ New extra description field
+
     private String reportLink;
 
     @Column(columnDefinition = "TEXT") // Store technologiesUsed as JSON
@@ -28,7 +32,10 @@ public class Project {
     private String objectives;
 
     @Lob
-    private byte[] image; // Store image as a byte array
+    private byte[] image; // Store main project image
+
+    @Lob
+    private byte[] displayImage; // ✅ New extra display image field
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -55,6 +62,14 @@ public class Project {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getExtraDescription() {
+        return extraDescription;
+    }
+
+    public void setExtraDescription(String extraDescription) {
+        this.extraDescription = extraDescription;
     }
 
     public String getReportLink() {
@@ -105,5 +120,13 @@ public class Project {
 
     public void setImage(byte[] image) {
         this.image = image;
+    }
+
+    public byte[] getDisplayImage() {
+        return displayImage;
+    }
+
+    public void setDisplayImage(byte[] displayImage) {
+        this.displayImage = displayImage;
     }
 }
